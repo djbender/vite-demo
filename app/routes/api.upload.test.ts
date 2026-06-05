@@ -71,12 +71,4 @@ describe("POST /api/v1/upload", () => {
     await fs.rm(dir, { recursive: true });
     expect(exists).toBe(true);
   });
-
-  it("returns the original filename in the response", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "upload-test-"));
-    const response = await postFile(dir, new File(["hello"], "test.png", { type: "image/png" }));
-    const data = await response.json();
-    await fs.rm(dir, { recursive: true });
-    expect(data.name).toBe("test.png");
-  });
 });

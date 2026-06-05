@@ -3,11 +3,19 @@ import { useFetcher } from "react-router";
 import type { Route } from "./+types/home";
 import { listFiles, getUploadsDir } from "../lib/uploads.server";
 import { formatSize, isImage } from "../lib/files";
+import { FileSchema } from "../lib/file.schema";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const dir = await getUploadsDir(request);
   const files = await listFiles(dir);
-  return { files };
+  const validFiles: Array<{ diskName: string; name: string; size: number }> = [];
+  for (const file of files) {
+    const result = FileSchema.safeParse(file);
+    if (result.success) {
+      validFiles.push(result.data);
+    }
+  }
+  return { files: validFiles };
 }
 
 type UploadResult = { name: string; size: number; path: string; diskName: string };

@@ -66,6 +66,19 @@ describe("GET /api/v1/upload/:filename", () => {
     expect(response.headers.get("Content-Type")).toBe("application/octet-stream");
   });
 
+  it("DELETE returns 400 for path traversal in filename", async () => {
+    const { action } = await import("./api.upload.$filename");
+    const request = new Request(`http://localhost/api/v1/upload/../../etc/passwd`, {
+      method: "DELETE",
+      headers: { Cookie: `unique-uploads-dir=./uploads` },
+    });
+    const response = await action({ request, params: { filename: "../../etc/passwd" }, context: {} } as never);
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBe("File validation failed");
+    expect(data.issues).toBeDefined();
+  });
+
   it("DELETE returns 405 for non-DELETE methods", async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "upload-test-"));
     const { action } = await import("./api.upload.$filename");
