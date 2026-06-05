@@ -147,6 +147,18 @@ test("delete failure shows red error text", async ({ page, uploadsDir }) => {
   await expect(page.locator(".error")).toBeVisible();
 });
 
+test("delete all removes all file rows", async ({ page, uploadsDir }) => {
+  await fs.writeFile(path.join(uploadsDir, "550e8400-e29b-41d4-a716-446655440000__alpha.txt"), "content");
+  await fs.writeFile(path.join(uploadsDir, "550e8400-e29b-41d4-a716-446655440000__beta.txt"), "content");
+  await page.goto("/");
+  await expect(page.getByText("alpha.txt", { exact: true })).toBeVisible();
+  await expect(page.getByText("beta.txt", { exact: true })).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Delete All" }).click();
+  await expect(page.getByText("alpha.txt", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("beta.txt", { exact: true })).toHaveCount(0);
+});
+
 test("existing file shows human-readable size", async ({ page, uploadsDir }) => {
   await fs.writeFile(path.join(uploadsDir, "550e8400-e29b-41d4-a716-446655440000__hello.txt"), "x".repeat(2048));
   await page.goto("/");
