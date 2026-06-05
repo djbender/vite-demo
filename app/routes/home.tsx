@@ -65,7 +65,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div data-hydrated={hydrated ? "true" : undefined}>
+    <div className="upload-manager" data-hydrated={hydrated ? "true" : undefined}>
       <h1>File Upload Manager</h1>
 
       <div>
