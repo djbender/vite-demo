@@ -53,20 +53,20 @@ test("existing image thumbnail loads successfully", async ({ page, uploadsDir })
   expect(loaded).toBe(true);
 });
 
-test("choosing an image uploads it and shows its name", async ({ page, uploadsDir }) => {
+test("choosing an image uploads it and shows its name", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles("e2e/fixtures/sample.png");
   await page.waitForSelector("ul li");
   await expect(page.getByText("sample.png", { exact: true }).first()).toBeVisible();
 });
 
-test("uploaded image shows size", async ({ page, uploadsDir }) => {
+test("uploaded image shows size", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles("e2e/fixtures/sample.png");
   await expect(page.locator("text=/\\d+(\\.\\d+)? (B|KB|MB)/").first()).toBeVisible();
 });
 
-test("uploaded image shows inline preview", async ({ page, uploadsDir }) => {
+test("uploaded image shows inline preview", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles("e2e/fixtures/sample.png");
   const img = page.locator("img[alt='sample.png']").first();
@@ -75,7 +75,7 @@ test("uploaded image shows inline preview", async ({ page, uploadsDir }) => {
   expect(loaded).toBe(true);
 });
 
-test("shows Uploading… and disabled button during upload", async ({ page, uploadsDir }) => {
+test("shows Uploading… and disabled button during upload", async ({ page }) => {
   let release!: () => void;
   const held = new Promise<void>((resolve) => { release = resolve; });
   await page.route("**/api/v1/upload", async (route) => {
@@ -88,7 +88,7 @@ test("shows Uploading… and disabled button during upload", async ({ page, uplo
   release();
 });
 
-test("uploading a non-image shows its name", async ({ page, uploadsDir }) => {
+test("uploading a non-image shows its name", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles({
     name: "notes.txt",
@@ -98,7 +98,7 @@ test("uploading a non-image shows its name", async ({ page, uploadsDir }) => {
   await expect(page.getByText("notes.txt", { exact: true }).first()).toBeVisible();
 });
 
-test("uploading a non-image shows no preview", async ({ page, uploadsDir }) => {
+test("uploading a non-image shows no preview", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles({
     name: "notes.txt",
@@ -109,7 +109,7 @@ test("uploading a non-image shows no preview", async ({ page, uploadsDir }) => {
   expect(await img.count()).toBe(0);
 });
 
-test("uploading a file over 20MB shows red error and adds no row", async ({ page, uploadsDir }) => {
+test("uploading a file over 20MB shows red error and adds no row", async ({ page }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles({
     name: "big.bin",
@@ -119,7 +119,7 @@ test("uploading a file over 20MB shows red error and adds no row", async ({ page
   await expect(page.locator(".error")).toBeVisible();
 });
 
-test("deleting an uploaded file removes its row", async ({ page, uploadsDir }) => {
+test("deleting an uploaded file removes its row", async ({ page, uploadsDir: _uploadsDir }) => {
   await gotoReady(page);
   await page.locator("input[type='file']").setInputFiles("e2e/fixtures/sample.png");
   await expect(page.getByText("sample.png", { exact: true }).first()).toBeVisible();
