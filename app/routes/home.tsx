@@ -20,6 +20,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 type UploadResult = { name: string; size: number; path: string; diskName: string };
 type DeleteResult = { ok: boolean };
+type DeleteAllResult = { deleted: number };
 type ErrorResult = { error: string };
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -27,6 +28,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadFetcher = useFetcher<UploadResult | ErrorResult>();
   const deleteFetcher = useFetcher<DeleteResult | ErrorResult>();
+  const deleteAllFetcher = useFetcher<DeleteAllResult | ErrorResult>();
 
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -39,6 +41,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   const deleteData = deleteFetcher.data as DeleteResult | ErrorResult | undefined;
   const deleteError = deleteData && "error" in deleteData ? deleteData.error : null;
+
+  const deleteAllData = deleteAllFetcher.data as DeleteAllResult | ErrorResult | undefined;
+  const deleteAllError = deleteAllData && "error" in deleteAllData ? deleteAllData.error : null;
 
   const uploading = uploadFetcher.state !== "idle";
   const uploadData = uploadFetcher.data as UploadResult | ErrorResult | undefined;
@@ -64,6 +69,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     });
   }
 
+  function handleDeleteAll() {
+    if (!confirm(`Delete all ${files.length} file(s)?`)) return;
+    deleteAllFetcher.submit(null, {
+      action: "/api/v1/bulk-delete",
+      method: "DELETE",
+    });
+  }
+
   return (
     <div className="upload-manager" data-hydrated={hydrated ? "true" : undefined}>
       <h1>File Upload Manager</h1>
@@ -83,6 +96,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </button>
         {uploadError && <p className="error">{uploadError}</p>}
         {deleteError && <p className="error">{deleteError}</p>}
+        {deleteAllError && <p className="error">{deleteAllError}</p>}
+
+        {files.length > 0 && (
+          <button onClick={handleDeleteAll} disabled={!hydrated || uploading}>
+            Delete All
+          </button>
+        )}
       </div>
 
       <ul>

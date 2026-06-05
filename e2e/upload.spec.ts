@@ -133,7 +133,7 @@ test("deleting an existing file removes its row", async ({ page, uploadsDir }) =
   await page.goto("/");
   await expect(page.getByText("hello.txt", { exact: true })).toBeVisible();
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Delete" }).click();
+  await page.locator("li", { hasText: "hello.txt" }).getByRole("button", { name: "Delete" }).click();
   await expect(page.getByText("hello.txt", { exact: true })).toHaveCount(0);
 });
 
@@ -143,7 +143,7 @@ test("delete failure shows red error text", async ({ page, uploadsDir }) => {
   await page.goto("/");
   await fs.unlink(path.join(uploadsDir, diskName));
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Delete" }).click();
+  await page.locator("li", { hasText: "hello.txt" }).getByRole("button", { name: "Delete" }).click();
   await expect(page.locator(".error")).toBeVisible();
 });
 
