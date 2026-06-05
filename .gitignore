@@ -3,3 +3,4 @@ uploads/
 test-results/
 .react-router/
 build/
+coverage/
