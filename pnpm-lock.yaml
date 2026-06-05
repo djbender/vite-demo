@@ -20,9 +20,6 @@ importers:
       '@remix-run/form-data-parser':
         specifier: ^0.17.3
         version: 0.17.3
-      isbot:
-        specifier: ^5
-        version: 5.1.40
       react:
         specifier: ^19.2.7
         version: 19.2.7
